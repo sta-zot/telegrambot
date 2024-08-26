@@ -1,3 +1,0 @@
-[console_scripts]
-pip3-utils = pip_utils.cli:main
-
