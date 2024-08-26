@@ -1,0 +1,9 @@
+sqlalchemy
+polars
+numpy
+pydantic
+aiogram
+asyncio
+aiosqlite
+python-dotenv
+pydantic-settings
