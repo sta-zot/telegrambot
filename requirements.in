@@ -7,3 +7,4 @@ asyncio
 aiosqlite
 python-dotenv
 pydantic-settings
+emoji

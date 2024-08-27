@@ -1,0 +1,66 @@
+Project Bot {
+    
+    database_type: 'SQLite'
+    Note: 'DataBase for ntktgram bot'
+}
+
+Table locations {
+    id varchar(3) [pk]
+    name varchar [unique]
+
+}
+
+Table roles {
+    id integer [pk, increment]
+    name varchar [unique, not null]
+}
+
+Table users {
+    // Идентификатор берётся из приложения телеграм
+    id integer [pk, increment] 
+    role integer [ref: > roles.id]
+    email varchar [not null, unique]
+    location_id int [ref: > locations.id]
+    age int [not null] // Проверка на пределы (с 14 - 90)
+    Indexes{
+        email [name: 'email_index', note: "User mail"]
+    }
+
+}
+
+Table themes {
+    id integer [pk]
+    name varchar [unique] // темы могут повторяться?
+}
+
+Table questions  {
+    id int [pk, increment]
+    question varchar
+    theme_id in [ref: > themes.id]
+}
+
+Table answers  {
+    id int [pk, increment]
+    question_id int [ref: > questions.id]
+    answer varchar
+    is_correct bool
+}
+
+
+Table tests [headercolor: #ff0000] {
+
+    user_id int [ref: < users.id]
+    theme_id int [ref: > themes.id]
+    question_id int [ref: < questions.id]
+    answer_id int [ref: < answers.id]
+    passing_time datetime [default: "datetime.now()"]
+    point int
+
+    Indexes {
+        (user_id, event_id, question_id, answer_id)[pk, unique]
+    }
+
+    note: "Таблица тестирования"
+    
+}
+

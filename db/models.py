@@ -12,6 +12,7 @@ from sqlalchemy.orm import (
     Mapped,
     foreign_key 
 )
+from sqlalchemy.types import BigInteger
 
 
 from sqlalchemy import String, Integer, Float, ForeignKey
@@ -25,3 +26,13 @@ class Table(Base):
     def __tablename__ (cls):
         return cls.__name__.lower()+"s"
 
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    
+class User(Table):
+    id: Mapped[BigInteger] = mapped_column(BigInteger,
+                                           primary_key=True,
+                                           autoincrement=True
+                                           )
+    
+    role: Mapped[str] = mapped_column(String(20), nullable=False)
+    

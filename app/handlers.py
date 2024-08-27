@@ -4,6 +4,7 @@ from aiogram.types import Message, CallbackQuery
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from aiogram import F
+from app.messages import welcome_message, reg_message
 
 
 router = Router()
@@ -58,9 +59,10 @@ class Questions(StatesGroup):
 
 @router.message(Command("start"))
 async def cmd_start(message: Message, state: FSMContext):
-    await message.answer("Hello! This is \"Start\" command handler")
+    await message.answer(welcome_message)
     await state.update_data(name=message.from_user.first_name)
     await state.update_data(id=message.from_user.id)
+    await message.answer(reg_message)
     await message.answer("Введите регион проживания")
     await state.set_state(Register.location)
 
@@ -82,3 +84,9 @@ async def register_gender(message: Message, state: FSMContext):
     data = await state.get_data()
     await message.answer(f"Регистрация завершена! Ваши данные: {data}")
     await state.clear()
+
+
+@router.message(F.text)
+async def echo(message: Message):
+    await message.answer(message.text)
+    print(message.text)
