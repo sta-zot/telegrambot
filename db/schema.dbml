@@ -1,0 +1,72 @@
+
+Table locations {
+    id varchar(3) [pk, increment]
+    name varchar(3) [unique]
+    district_id varchar(4) [ref: > districts.id]
+}
+
+Table districts {
+    id varchar(4) [pk]
+    name varchar [unique, not null]
+
+}
+
+
+
+Table users {
+    id integer [pk, increment]
+    email varchar [not null, unique]
+    location_id int [ref: > locations.id]
+    age int 
+    sex varchar(1) [note: "enum"]
+    is_admin bool 
+    Indexes{
+        email [name: 'email_index', note: "User mail"]000
+    }
+    
+
+}
+
+Table questions [headercolor: #00777f] {
+    id int [pk, increment]
+    question varchar
+    theme_id int [ref:> themes.id]
+}
+
+Table answers [headercolor: #0f0f2b] {
+    id int [pk, increment]
+    question_id int [ref: > questions.id]
+    answer varchar
+    is_correct bool
+}
+Table themes{
+
+    id int [pk, increment]
+    name varchar
+    note: "Таблица с событиями"
+}
+
+Table tests [headercolor: #ff0000] {
+
+    user_id int [ref: < users.id]
+    question_id int [ref: < questions.id]
+    answer_id int [ref: < answers.id]
+    point int
+    testing_start datetime 
+
+    Indexes {
+        (user_id, event_id, question_id, answer_id)[pk, unique]
+    }
+
+    note: "Таблица тестирования"
+    
+}
+
+
+//note: "Регистрация:
+//    • округ
+//    • регион
+//    • возраст
+//    • пол
+//Тестирование:
+//тема занятия
