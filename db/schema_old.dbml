@@ -49,10 +49,10 @@ Table answers  {
 
 Table tests [headercolor: #ff0000] {
 
-    user_id int [ref: < users.id]
+    user_id int [ref: > users.id]
     theme_id int [ref: > themes.id]
-    question_id int [ref: < questions.id]
-    answer_id int [ref: < answers.id]
+    question_id int [ref: > questions.id]
+    answer_id int [ref: > answers.id]
     passing_time datetime [default: "datetime.now()"]
     point int
 
