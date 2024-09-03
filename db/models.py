@@ -6,26 +6,39 @@ The sqlalchemy library is used to describe the models
 Для описания моделей используется библиотека sqlalchemy
 """
 
-from sqlalchemy.orm import declarative_base, relationship, mapped_column, Mapped
-from sqlalchemy.types import BigInteger, String, DateTime
+from sqlalchemy.orm import DeclarativeBase, relationship, mapped_column, Mapped
+from sqlalchemy.types import BigInteger, String, DateTime, Integer
 from sqlalchemy.sql import func
 from sqlalchemy import ForeignKey
-from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.orm import declared_attr
 from sqlalchemy.ext.asyncio import AsyncAttrs
 
 
-Base = declarative_base(cls=AsyncAttrs)
-
-
-class Table(Base):
+class Base(AsyncAttrs, DeclarativeBase):
+    
     @declared_attr
     def __tablename__(cls):
-        return cls.__name__.lower() + "s"
+        return f"{cls.__name__.lower()}s"
+
+
+class Role(Base):
+    """
+    Таблица ролей пользователей приложения с полями:
+    id - уникальный идентификатор роли, берётся из telegram id
+    name - название роли, не может быть пустым, уникальное поле
+    """
+    
+    __tablename__ = "roles"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    name: Mapped[str] = mapped_column(String(100), nullable=False, unique=True)
+    users: Mapped[list["User"]] = relationship(back_populates="role")
+
+    def __repr__(self):
+        return f"Role(id={self.id}, name='{self.name}')"
 
 
-class User(Table):
+class User(Base):
     """
     Таблица пользователей приложения с полями:
     id - уникальный идентификатор пользователя, берётся из telegram id
@@ -58,19 +71,7 @@ class User(Table):
     location: Mapped["Location"] = relationship(back_populates="users")
 
 
-class Role(Table):
-    """
-    Таблица ролей пользователей приложения с полями:
-    id - уникальный идентификатор роли, берётся из telegram id
-    name - название роли, не может быть пустым, уникальное поле
-    """
-
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    name: Mapped[str] = mapped_column(String(100), nullable=False, unique=True)
-    users: Mapped[list["User"]] = relationship(back_populates="role")
-
-
-class Location(Table):
+class Location(Base):
     """
     Таблица локаций пользователей приложения с полями:
     id - уникальный идентификатор локации, берётся из telegram id
@@ -91,7 +92,7 @@ class Location(Table):
     users: Mapped[list["User"]] = relationship(back_populates="location")
 
 
-class District(Table):
+class District(Base):
     """
     Таблица регионов пользователей приложения с полями:
     id - уникальный идентификатор региона, берётся из telegram id
@@ -106,7 +107,7 @@ class District(Table):
         back_populates="district")
 
 
-class Theme(Table):
+class Theme(Base):
     """
     Таблица тематик вопросов с полями:
     id - уникальный идентификатор темы
@@ -118,7 +119,7 @@ class Theme(Table):
     questions: Mapped[list["Question"]] = relationship(back_populates="theme")
 
 
-class Question(Table):
+class Question(Base):
     """
     Таблица вопросов с полями:
     id - уникальный идентификатор вопроса
@@ -136,7 +137,7 @@ class Question(Table):
     answers: Mapped[list["Answer"]] = relationship(back_populates="question")
 
 
-class Answer(Table):
+class Answer(Base):
     """
     Таблица ответов с полями:
     id - уникальный идентификатор ответа
@@ -154,7 +155,7 @@ class Answer(Table):
     question: Mapped["Question"] = relationship(back_populates="answers")
 
 
-class Test(Table):
+class Test(Base):
     """
     Таблица тестов с полями:
     id - уникальный идентификатор теста
@@ -163,7 +164,7 @@ class Test(Table):
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     start_time = mapped_column(
-        DateTime, nullable=False, server_default=func.now)
+        DateTime, nullable=False, server_default=func.now())
     user_id: Mapped[int] = mapped_column(
         ForeignKey("users.id"), nullable=False)
     user: Mapped["User"] = relationship(back_populates="tests")
@@ -175,3 +176,5 @@ class Test(Table):
         ForeignKey("answers.id"), nullable=False)
     answer: Mapped["Answer"] = relationship(back_populates="tests")
     point: Mapped[int] = mapped_column(Integer, nullable=False)
+
+

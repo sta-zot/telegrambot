@@ -1,5 +1,6 @@
 .venv/
 .vscode/
 **/__pycache__/
+.idea/
 .env
 test_em.py
