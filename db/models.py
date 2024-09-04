@@ -10,12 +10,12 @@ from sqlalchemy.orm import DeclarativeBase, relationship, mapped_column, Mapped
 from sqlalchemy.types import BigInteger, String, DateTime, Integer
 from sqlalchemy.sql import func
 from sqlalchemy import ForeignKey
-from sqlalchemy.orm import declared_attr
+from sqlalchemy.orm import declared_attr, joinedload
 from sqlalchemy.ext.asyncio import AsyncAttrs
 
 
 class Base(AsyncAttrs, DeclarativeBase):
-    
+
     @declared_attr
     def __tablename__(cls):
         return f"{cls.__name__.lower()}s"
@@ -27,7 +27,7 @@ class Role(Base):
     id - уникальный идентификатор роли, берётся из telegram id
     name - название роли, не может быть пустым, уникальное поле
     """
-    
+
     __tablename__ = "roles"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
@@ -55,19 +55,16 @@ class User(Base):
     id: Mapped[BigInteger] = mapped_column(
         BigInteger, primary_key=True, autoincrement=True
     )
-    email: Mapped[str] = mapped_column(
-        String(100), nullable=False, unique=True)
+    email: Mapped[str] = mapped_column(String(100), nullable=False, unique=True)
     age: Mapped[int] = mapped_column(Integer, nullable=False)
     sex: Mapped[str] = mapped_column(String(1), nullable=False)
     # Связь с таблицей ролей
     # Relationship with the "Role" table
-    role_id: Mapped[int] = mapped_column(
-        ForeignKey("roles.id"), nullable=False)
+    role_id: Mapped[int] = mapped_column(ForeignKey("roles.id"), nullable=False)
     role: Mapped["Role"] = relationship(back_populates="users")
     # Связь с таблицей локаций
     # Relationship with the "Location" table
-    location_id: Mapped[int] = mapped_column(
-        ForeignKey("locations.id"), nullable=False)
+    location_id: Mapped[int] = mapped_column(ForeignKey("locations.id"), nullable=False)
     location: Mapped["Location"] = relationship(back_populates="users")
 
 
@@ -103,8 +100,7 @@ class District(Base):
         String(4), primary_key=True, nullable=False, unique=True
     )
     name: Mapped[str] = mapped_column(String(100), nullable=False, unique=True)
-    locations: Mapped[list["Location"]] = relationship(
-        back_populates="district")
+    locations: Mapped[list["Location"]] = relationship(back_populates="district")
 
 
 class Theme(Base):
@@ -130,8 +126,7 @@ class Question(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     text: Mapped[str] = mapped_column(String(500), nullable=False)
-    theme_id: Mapped[int] = mapped_column(
-        ForeignKey("themes.id"), nullable=False)
+    theme_id: Mapped[int] = mapped_column(ForeignKey("themes.id"), nullable=False)
     theme: Mapped["Theme"] = relationship(back_populates="questions")
 
     answers: Mapped[list["Answer"]] = relationship(back_populates="question")
@@ -150,8 +145,7 @@ class Answer(Base):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     text: Mapped[str] = mapped_column(String(500), nullable=False)
     is_correct: Mapped[bool] = mapped_column(nullable=False)
-    question_id: Mapped[int] = mapped_column(
-        ForeignKey("questions.id"), nullable=False)
+    question_id: Mapped[int] = mapped_column(ForeignKey("questions.id"), nullable=False)
     question: Mapped["Question"] = relationship(back_populates="answers")
 
 
@@ -163,18 +157,11 @@ class Test(Base):
     """
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    start_time = mapped_column(
-        DateTime, nullable=False, server_default=func.now())
-    user_id: Mapped[int] = mapped_column(
-        ForeignKey("users.id"), nullable=False)
+    start_time = mapped_column(DateTime, nullable=False, server_default=func.now())
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
     user: Mapped["User"] = relationship(back_populates="tests")
-
-    question_id: Mapped[int] = mapped_column(
-        ForeignKey("questions.id"), nullable=False)
+    question_id: Mapped[int] = mapped_column(ForeignKey("questions.id"), nullable=False)
     question: Mapped["Question"] = relationship(back_populates="tests")
-    answer_id: Mapped[int] = mapped_column(
-        ForeignKey("answers.id"), nullable=False)
+    answer_id: Mapped[int] = mapped_column(ForeignKey("answers.id"), nullable=False)
     answer: Mapped["Answer"] = relationship(back_populates="tests")
     point: Mapped[int] = mapped_column(Integer, nullable=False)
-
-
