@@ -3,7 +3,7 @@ _summary_
 """
 
 
-from configuration import config
+from settings.configuration import config
 
 
 if __name__ == "__main__":

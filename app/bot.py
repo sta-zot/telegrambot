@@ -1,7 +1,7 @@
 import asyncio
 from aiogram import Dispatcher, Bot
 from aiogram.methods import DeleteWebhook
-from configuration import config
+from settings.configuration import config
 from app.commands import general_commands
 from app.handlers import router as handler_router
 

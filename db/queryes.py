@@ -9,11 +9,12 @@ from typing import List
 from sqlalchemy.ext.asyncio import (
     AsyncSession,
     async_sessionmaker,
-    create_async_engine
+    create_async_engine,
+    AsyncEngine
 )
 from sqlalchemy import select, insert, update, delete
 
-from configuration import config
+from settings.configuration import config
 
 from db.models import (
     Base,
@@ -29,6 +30,15 @@ from db.models import (
 engine = create_async_engine(config.db_url, echo=True)
 
 
+async def create_db(engine: AsyncEngine) -> None:
+    """
+    The function creates the database tables
+
+    Функция создает таблицы базы данных
+    """
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+
 async def get_session() -> AsyncSession:
     """
     The function returns an asynchronous database session
@@ -37,11 +47,3 @@ async def get_session() -> AsyncSession:
     """
     yield async_sessionmaker(engine)
 
-
-async def main():
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
-        
-        
-if __name__ == "__main__":
-    asyncio.run(main())
